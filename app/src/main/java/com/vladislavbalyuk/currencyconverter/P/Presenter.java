@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Presenter {
 
-    ViewInterface view;
-    Model model;
+    private ViewInterface view;
+    private Model model;
 
     public Presenter(ViewInterface view) {
         this.view = view;
@@ -50,7 +50,7 @@ public class Presenter {
         if(currencyValueIn == null){return "";}
 
         sum = new BigDecimal(strSum);
-        sum.setScale(2, BigDecimal.ROUND_DOWN);
+        sum = sum.setScale(2, BigDecimal.ROUND_DOWN);
 
         result = sum.multiply(currencyValueFrom.getValue())
                 .multiply(new BigDecimal(currencyValueIn.getNominal()))
@@ -68,4 +68,10 @@ public class Presenter {
         view.notifyAdapter();
     }
 
+    public void checkSum(String s){
+        int i = s.indexOf(".");
+        if(i != -1 && (s.length() - i) > 3){
+            view.setTextSum(s.substring(0, i + 3));
+        }
+    }
 }

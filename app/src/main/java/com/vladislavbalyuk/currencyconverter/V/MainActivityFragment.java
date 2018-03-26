@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,6 +92,23 @@ public class MainActivityFragment extends Fragment implements ViewInterface {
                 }
             });
 
+            textSum.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    presenter.checkSum(textSum.getText().toString());
+                }
+            });
+
         }
         return view;
     }
@@ -109,7 +128,13 @@ public class MainActivityFragment extends Fragment implements ViewInterface {
         spinnerIn.setAdapter(adapter);
     }
 
-    public class CurrencyAdapter extends ArrayAdapter<CurrencyValue> {
+    @Override
+    public void setTextSum(String s) {
+        textSum.setText("");
+        textSum.append(s);
+    }
+
+    private class CurrencyAdapter extends ArrayAdapter<CurrencyValue> {
 
         private LayoutInflater inflater;
         private int layout;
