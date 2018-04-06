@@ -1,5 +1,6 @@
-package com.vladislavbalyuk.currencyconverter.V;
+package com.vladislavbalyuk.currencyconverter.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -44,7 +45,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_values) {
+            startActivity(new Intent(this, ValuesActivity.class));
             return true;
         }
 

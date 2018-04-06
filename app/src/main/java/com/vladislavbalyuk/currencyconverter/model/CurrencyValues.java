@@ -1,4 +1,4 @@
-package com.vladislavbalyuk.currencyconverter.M;
+package com.vladislavbalyuk.currencyconverter.model;
 
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;

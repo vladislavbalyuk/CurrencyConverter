@@ -1,4 +1,4 @@
-package com.vladislavbalyuk.currencyconverter.M;
+package com.vladislavbalyuk.currencyconverter.model;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,22 +6,23 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteCantOpenDatabaseException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observable;
+import rx.schedulers.Schedulers;
 
 public class DB {
     private static DB instance;
 
-    public DBHelper dbh;
-    public SQLiteDatabase db;
+    private DBHelper dbh;
+    private SQLiteDatabase db;
 
     private DB(Context context) {
         dbh = new DBHelper(context);
-        try {
-            db = dbh.getWritableDatabase();
-        }
-        catch (SQLiteCantOpenDatabaseException e){}
     }
 
     public static synchronized DB getInstance(Context context) {
@@ -31,13 +32,20 @@ public class DB {
         return instance;
     }
 
-    public synchronized void updateCurrency(List<CurrencyValue> listCurrencyValue) {
-        db.beginTransaction();
-        for(CurrencyValue currencyValue : listCurrencyValue){
-            update(currencyValue);
+    public void updateCurrency(List<CurrencyValue> listCurrencyValue) {
+        try {
+            db = dbh.getWritableDatabase();
+            db.beginTransaction();
+            for (CurrencyValue currencyValue : listCurrencyValue) {
+                update(currencyValue);
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
+        catch (SQLiteCantOpenDatabaseException e){}
+        finally {
+            dbh.close();
+        }
     }
 
     private void update(CurrencyValue currencyValue) {
@@ -45,10 +53,10 @@ public class DB {
         cv.put("_id", currencyValue.getId());
         cv.put("CharCode", currencyValue.getCharCode());
         cv.put("Nominal", currencyValue.getNominal());
-        cv.put("Value", currencyValue.getValue().toString());
+        cv.put("Value", currencyValue.getValue().add(new BigDecimal(0)).toString());
         cv.put("Name", currencyValue.getName());
 
-        if (db.update("CurrencyValues", cv, "_id = ?", new String[]{currencyValue.getCharCode()}) == 0) {
+        if (db.update("CurrencyValues", cv, "_id = ?", new String[]{currencyValue.getId()}) == 0) {
               insert(currencyValue);
         }
     }
@@ -71,29 +79,36 @@ public class DB {
 
         String sqlQuery = "select CV._id, CV.CharCode, CV.Nominal, CV.Value, CV.Name from CurrencyValues as CV ";
 
-        Cursor c = db.rawQuery(sqlQuery, null);
-        if (c != null) {
-            if (c.moveToFirst()) {
-                do {
-                    currencyValue = new CurrencyValue();
-                    currencyValue.setId(c.getString(0));
-                    currencyValue.setCharCode(c.getString(1));
-                    currencyValue.setNominal(c.getInt(2));
-                    currencyValue.setValueFromString(c.getString(3));
-                    currencyValue.setName(c.getString(4));
+        try {
+            db = dbh.getWritableDatabase();
+            Cursor c = db.rawQuery(sqlQuery, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    do {
+                        currencyValue = new CurrencyValue();
+                        currencyValue.setId(c.getString(0));
+                        currencyValue.setCharCode(c.getString(1));
+                        currencyValue.setNominal(c.getInt(2));
+                        currencyValue.setValueFromString(c.getString(3));
+                        currencyValue.setName(c.getString(4));
 
-                    listCurrencyValue.add(currencyValue);
-                } while (c.moveToNext());
+                        listCurrencyValue.add(currencyValue);
+                    } while (c.moveToNext());
+                }
             }
+        }
+        catch (SQLiteCantOpenDatabaseException e){}
+        finally {
+            dbh.close();
         }
 
         return listCurrencyValue;
     }
 
-    class DBHelper extends SQLiteOpenHelper {
+    private class DBHelper extends SQLiteOpenHelper {
         Context context;
 
-        public DBHelper(Context context) {
+        private DBHelper(Context context) {
             super(context, "CurrencyConverter", null, 1);
             this.context = context;
         }

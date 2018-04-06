@@ -1,4 +1,4 @@
-package com.vladislavbalyuk.currencyconverter.M;
+package com.vladislavbalyuk.currencyconverter.model;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 public class LoadCurrencyService extends IntentService {
 
-    Context context;
-    public DB dataBase;
+    private Context context;
+    private DB dataBase;
 
 
     public LoadCurrencyService() {

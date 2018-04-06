@@ -1,9 +1,12 @@
 <resources>
-    <string name="app_name">Конвертер валют</string>
-    <string name="action_settings">Settings</string>
+    <string name="app_name">Конвертер валют ЦБ</string>
+    <string name="action_values">Курсы валют</string>
     <string name="api_url_values">http://www.cbr.ru/scripts/XML_daily.asp</string>
     <string name="api_url_currencies">http://www.cbr.ru/scripts/XML_valFull.asp</string>
     <string name="text1">Пересчитать</string>
     <string name="text2">в</string>
     <string name="text3">Результат</string>
+    <string name="name_preferences">CurrencyConverter</string>
+    <string name="title_activity_values">Курсы валют</string>
+    <string name="update_done">Обновление выполнено</string>
 </resources>

@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
-    style="?android:attr/spinnerItemStyle"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
-    android:ellipsize="marquee"
-    android:textAlignment="inherit"/>
+    android:layout_height="@dimen/item_height">
+    <ImageView
+        android:layout_width="@dimen/image_size"
+        android:layout_height="@dimen/image_size"
+        android:layout_marginLeft="@dimen/layout_margin"
+        android:id="@+id/imageView"/>
+
+    <TextView
+        android:id="@android:id/text1"
+        style="?android:attr/spinnerItemStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:ellipsize="marquee"
+        android:textAlignment="inherit"/>
+
+</LinearLayout>

@@ -1,10 +1,8 @@
-package com.vladislavbalyuk.currencyconverter.M;
+package com.vladislavbalyuk.currencyconverter.model;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
-
-import java.math.BigDecimal;
 
 @Root(name="Item")
 public class Currency {

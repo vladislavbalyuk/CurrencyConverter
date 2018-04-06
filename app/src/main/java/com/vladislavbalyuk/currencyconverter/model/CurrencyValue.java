@@ -1,10 +1,11 @@
-package com.vladislavbalyuk.currencyconverter.M;
+package com.vladislavbalyuk.currencyconverter.model;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 
 @Root(name="Valute")
 public class CurrencyValue {
@@ -65,4 +66,15 @@ public class CurrencyValue {
     public void setName(String name) {
         this.name = name;
     }
+
+    public static Comparator<CurrencyValue> comparator = new Comparator<CurrencyValue>(){
+        public int compare(CurrencyValue currencyValue1, CurrencyValue currencyValue2) {
+
+            String charCode1 = currencyValue1.getCharCode().toUpperCase();
+            String charCode2 = currencyValue2.getCharCode().toUpperCase();
+
+            return charCode1.compareTo(charCode2);
+
+        }
+    };
 }
