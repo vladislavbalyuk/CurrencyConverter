@@ -19,4 +19,20 @@ public class CurrencyValues {
     public void setListCurrencyValue(List<CurrencyValue> listCurrencyValue) {
         this.listCurrencyValue = listCurrencyValue;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CurrencyValues)) return false;
+
+        CurrencyValues that = (CurrencyValues) o;
+
+        return getListCurrencyValue().equals(that.getListCurrencyValue());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getListCurrencyValue().hashCode();
+    }
 }

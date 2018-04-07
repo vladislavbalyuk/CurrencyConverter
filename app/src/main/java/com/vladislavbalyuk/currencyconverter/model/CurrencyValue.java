@@ -77,4 +77,29 @@ public class CurrencyValue {
 
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CurrencyValue)) return false;
+
+        CurrencyValue that = (CurrencyValue) o;
+
+        if (getNominal() != that.getNominal()) return false;
+        if (!getId().equals(that.getId())) return false;
+        if (!getCharCode().equals(that.getCharCode())) return false;
+        if (!getValue().equals(that.getValue())) return false;
+        return getName().equals(that.getName());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId().hashCode();
+        result = 31 * result + getCharCode().hashCode();
+        result = 31 * result + getNominal();
+        result = 31 * result + getValue().hashCode();
+        result = 31 * result + getName().hashCode();
+        return result;
+    }
 }

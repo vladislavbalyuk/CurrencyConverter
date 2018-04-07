@@ -29,5 +29,22 @@ public class Currency {
         this.name = name;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Currency)) return false;
 
+        Currency currency = (Currency) o;
+
+        if (!getId().equals(currency.getId())) return false;
+        return getName().equals(currency.getName());
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId().hashCode();
+        result = 31 * result + getName().hashCode();
+        return result;
+    }
 }
