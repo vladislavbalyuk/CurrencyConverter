@@ -75,13 +75,8 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
         } else {
             view = inflater.inflate(R.layout.fragment_main, container, false);
 
-            editTextSum = (TextInputEditText)view.findViewById(R.id.TextSumFrom);
-            textViewResult = (TextView)view.findViewById(R.id.TextResult);
+            initUI();
 
-            spinnerFrom = (Spinner) view.findViewById(R.id.SpinnerFrom);
-            spinnerIn = (Spinner) view.findViewById(R.id.SpinnerIn);
-
-            buttonReplace = (ImageButton) view.findViewById(R.id.btnReplace);
             buttonReplace.setOnClickListener(this);
 
             Observable<MainPresenter> observable = Observable.just(presenter);
@@ -154,7 +149,11 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
 
     public void getResult(){
 
-        String result = presenter.getResult(editTextSum.getText().toString());
+        String result = editTextSum.getText().toString() + " "
+                + presenter.getCurrencyValueFrom().getCharCode() + " = "
+                + presenter.getResult(editTextSum.getText().toString()) + " "
+                + presenter.getCurrencyValueIn().getCharCode();
+
         textViewResult.setText(result);
 
     }
@@ -206,6 +205,18 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
         ed.putString("charCodeCurrencyFrom", presenter.getCurrencyValueFrom().getCharCode());
         ed.putString("charCodeCurrencyIn", presenter.getCurrencyValueIn().getCharCode());
         ed.commit();    }
+
+    private void initUI(){
+
+        editTextSum = (TextInputEditText)view.findViewById(R.id.TextSumFrom);
+        textViewResult = (TextView)view.findViewById(R.id.TextResult);
+
+        spinnerFrom = (Spinner) view.findViewById(R.id.SpinnerFrom);
+        spinnerIn = (Spinner) view.findViewById(R.id.SpinnerIn);
+
+        buttonReplace = (ImageButton) view.findViewById(R.id.btnReplace);
+
+    }
 
     private class CurrencyAdapter extends ArrayAdapter<CurrencyValue> {
 
