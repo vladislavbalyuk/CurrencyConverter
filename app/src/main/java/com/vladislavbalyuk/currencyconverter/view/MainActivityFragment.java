@@ -18,10 +18,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.vladislavbalyuk.currencyconverter.App;
+import com.vladislavbalyuk.currencyconverter.model.Currency;
 import com.vladislavbalyuk.currencyconverter.model.CurrencyValue;
 import com.vladislavbalyuk.currencyconverter.presenter.MainPresenter;
 import com.vladislavbalyuk.currencyconverter.R;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +50,6 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
 
     private CurrencyAdapter adapter;
 
-    private boolean updateDone = false;
-
     private Map<String, Integer> flagMap;
 
     public MainActivityFragment() {
@@ -62,8 +62,6 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
         flagMap = presenter.getFlagMap();
         setRetainInstance(true);
 
-        presenter.loadCurrency();
-
     }
 
     @Override
@@ -75,15 +73,44 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
         } else {
             view = inflater.inflate(R.layout.fragment_main, container, false);
 
+            presenter.loadCurrency();
+
             initUI();
 
             buttonReplace.setOnClickListener(this);
 
             Observable<MainPresenter> observable = Observable.just(presenter);
-            observable.map(x -> {List<CurrencyValue> list = x.getListCurrency();
-                        Collections.sort(list, CurrencyValue.comparator);
-                        return list;
-                    })
+            observable.map(x -> {
+
+                                List<CurrencyValue> list = x.getListCurrency();
+                                Collections.sort(list, CurrencyValue.comparator);
+
+                                SharedPreferences sPref = App.getContext().getSharedPreferences(getResources().getString(R.string.name_preferences),MODE_PRIVATE);
+                                String charCodeFrom = sPref.getString("charCodeCurrencyFrom", "RUB");
+                                String charCodeIn = sPref.getString("charCodeCurrencyIn", "RUB");
+                                presenter.setCurrencyValueFrom(presenter.getCurrencyForCharCode(charCodeFrom));
+                                presenter.setCurrencyValueIn(presenter.getCurrencyForCharCode(charCodeIn));
+
+                        if(presenter.getCurrencyValueFrom() == null){
+                            CurrencyValue currencyValueFrom = new CurrencyValue();
+                            currencyValueFrom.setCharCode(charCodeFrom);
+                            currencyValueFrom.setId("");
+                            currencyValueFrom.setValue(new BigDecimal(0));
+                            currencyValueFrom.setName("");
+                            presenter.setCurrencyValueFrom(currencyValueFrom);
+                        }
+                        if(presenter.getCurrencyValueIn() == null){
+                            CurrencyValue currencyValueIn = new CurrencyValue();
+                            currencyValueIn.setCharCode(charCodeIn);
+                            currencyValueIn.setId("");
+                            currencyValueIn.setValue(new BigDecimal(0));
+                            currencyValueIn.setName("");
+                            presenter.setCurrencyValueIn(currencyValueIn);
+                        }
+
+                                return list;
+                            }
+                    )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(x -> {
@@ -116,12 +143,8 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
                             }
                         });
 
-                        SharedPreferences sPref = App.getContext().getSharedPreferences(getResources().getString(R.string.name_preferences),MODE_PRIVATE);
-                        String charCodeFrom = sPref.getString("charCodeCurrencyFrom", "RUB");
-                        String charCodeIn = sPref.getString("charCodeCurrencyIn", "RUB");
-                        presenter.setCurrencyValueFrom(presenter.getCurrencyForCharCode(charCodeFrom));
-                        presenter.setCurrencyValueIn(presenter.getCurrencyForCharCode(charCodeIn));
                         setSpinner();
+
                     });
 
 
@@ -149,12 +172,15 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
 
     public void getResult(){
 
-        String result = editTextSum.getText().toString() + " "
-                + presenter.getCurrencyValueFrom().getCharCode() + " = "
-                + presenter.getResult(editTextSum.getText().toString()) + " "
-                + presenter.getCurrencyValueIn().getCharCode();
+        if(!editTextSum.getText().toString().isEmpty()) {
 
-        textViewResult.setText(result);
+            String result = editTextSum.getText().toString() + " "
+                    + presenter.getCurrencyValueFrom().getCharCode() + " = "
+                    + presenter.getResult(editTextSum.getText().toString()) + " "
+                    + presenter.getCurrencyValueIn().getCharCode();
+
+            textViewResult.setText(result);
+        }
 
     }
 
@@ -171,6 +197,7 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
                     adapter.clear();
                     adapter.addAll(x);
                     adapter.notifyDataSetChanged();
+                    setSpinner();
                 });
     }
 
@@ -200,11 +227,13 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         SharedPreferences sPref = App.getContext().getSharedPreferences(getResources().getString(R.string.name_preferences),MODE_PRIVATE);
         SharedPreferences.Editor ed = sPref.edit();
         ed.putString("charCodeCurrencyFrom", presenter.getCurrencyValueFrom().getCharCode());
         ed.putString("charCodeCurrencyIn", presenter.getCurrencyValueIn().getCharCode());
-        ed.commit();    }
+        ed.apply();
+    }
 
     private void initUI(){
 
@@ -224,7 +253,7 @@ public class MainActivityFragment extends Fragment implements MainViewInterface,
         private int layout;
         private List<CurrencyValue> listCurrencyValue;
 
-        public CurrencyAdapter(Context context, int resource, List<CurrencyValue> listCurrencyValue) {
+        private CurrencyAdapter(Context context, int resource, List<CurrencyValue> listCurrencyValue) {
             super(context, resource, listCurrencyValue);
             this.listCurrencyValue = listCurrencyValue;
             this.layout = resource;

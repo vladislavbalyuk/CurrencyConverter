@@ -27,10 +27,10 @@ public class Model {
     private MainPresenter mainPresenter;
 
     private List<CurrencyValue> listCurrencyValue;
-    private CurrencyValue currencyValueFrom;
-    private CurrencyValue currencyValueIn;
+    private volatile CurrencyValue currencyValueFrom;
+    private volatile CurrencyValue currencyValueIn;
 
-    public Model(final MainPresenter mainPresenter) {
+    private Model(final MainPresenter mainPresenter) {
         context = App.getContext();
         this.dataBase = DB.getInstance(context);
         this.mainPresenter = mainPresenter;
@@ -44,9 +44,9 @@ public class Model {
                         .subscribe(x -> {
                                             listCurrencyValue = x;
                                             for(CurrencyValue currencyValue: listCurrencyValue){
-                                                if(currencyValue.getId().equals(currencyValueFrom.getId()))
+                                                if(currencyValueFrom != null && currencyValue.getCharCode().equals(currencyValueFrom.getCharCode()))
                                                     currencyValueFrom = currencyValue;
-                                                if(currencyValue.getId().equals(currencyValueIn.getId()))
+                                                if(currencyValueIn != null && currencyValue.getCharCode().equals(currencyValueIn.getCharCode()))
                                                     currencyValueIn = currencyValue;
                                             }
 
@@ -103,7 +103,7 @@ public class Model {
     }
 
     public Map<String, Integer> getFlagMap(){
-        Map<String, Integer> flagMap = new HashMap<String, Integer>();
+        Map<String, Integer> flagMap = new HashMap<>();
         flagMap.put("AMD", R.drawable.amd);
         flagMap.put("AUD", R.drawable.aud);
         flagMap.put("AZN", R.drawable.azn);

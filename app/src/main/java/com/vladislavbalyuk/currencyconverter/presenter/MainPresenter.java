@@ -85,10 +85,16 @@ public class MainPresenter {
     }
 
     public void checkSum(String s){
-        int i = s.indexOf(".");
-        if(i != -1 && (s.length() - i) > 3){
-            view.setEditTextSum(s.substring(0, i + 3));
+        String sum = s;
+        while(sum.length() > 1 && sum.substring(0,1).equals("0") && !sum.substring(1,2).equals("."))
+            sum = sum.substring(1);
+
+        int i = sum.indexOf(".");
+        if(i != -1 && (sum.length() - i) > 3){
+            sum = sum.substring(0, i + 3);
         }
+        if(!s.equals(sum))
+            view.setEditTextSum(sum);
     }
 
     public Map<String, Integer> getFlagMap(){
